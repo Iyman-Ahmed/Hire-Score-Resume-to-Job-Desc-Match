@@ -105,6 +105,7 @@ Return ONLY valid JSON, no other text:
     result = call_llm_json(
         "You are an expert ATS resume reviewer. Return only valid JSON.",
         prompt,
+        fast=True,
     )
 
     # Ensure required keys exist with safe defaults

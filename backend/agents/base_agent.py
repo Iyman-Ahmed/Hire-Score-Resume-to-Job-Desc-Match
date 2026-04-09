@@ -32,12 +32,14 @@ def call_llm(system: str, user: str, json_mode: bool = False, fast: bool = False
     return response.choices[0].message.content
 
 
-def call_llm_json(system: str, user: str) -> dict:
+def call_llm_json(system: str, user: str, fast: bool = False) -> dict:
     """LLM call that parses and returns a JSON dict."""
-    raw = call_llm(system, user, json_mode=True)
+    raw = call_llm(system, user, json_mode=True, fast=fast)
     try:
         return json.loads(raw)
     except (json.JSONDecodeError, TypeError):
         # Strip markdown code fences if the model wrapped the JSON
+        if not raw:
+            raise ValueError("LLM returned empty response")
         cleaned = raw.strip().removeprefix("```json").removeprefix("```").removesuffix("```").strip()
         return json.loads(cleaned)

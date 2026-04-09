@@ -175,7 +175,10 @@ function CandidateCard({ c, animate }: { c: Candidate; animate: boolean }) {
     setAtsError("");
     try {
       const res = await fetch(`${BASE}/api/resumes/${c.resume_id}/ats`);
-      if (!res.ok) throw new Error("ATS analysis failed");
+      if (!res.ok) {
+        const body = await res.json().catch(() => ({}));
+        throw new Error(body.detail || "ATS analysis failed");
+      }
       setAtsData(await res.json());
     } catch (e: unknown) {
       setAtsError(e instanceof Error ? e.message : "Failed to load ATS analysis");
