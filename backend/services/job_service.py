@@ -1,12 +1,21 @@
 from typing import Optional, List
 from sqlalchemy.orm import Session
 from database.models import Job, Match, Resume
-from embeddings.embedding_service import EmbeddingService
 from agents.jd_analyzer_agent import analyze_job_description
 from agents.matching_agent import score_match
 from agents.explanation_agent import generate_explanation, generate_resume_feedback
 
-embedding_service = EmbeddingService()
+_embedding_service = None
+
+def _get_embedding_service():
+    global _embedding_service
+    if _embedding_service is None:
+        try:
+            from embeddings.embedding_service import EmbeddingService
+            _embedding_service = EmbeddingService()
+        except Exception as e:
+            print(f"⚠️  EmbeddingService unavailable: {e}")
+    return _embedding_service
 
 
 def create_job(db: Session, title: str, company: str, description: str) -> Job:
@@ -19,11 +28,13 @@ def create_job(db: Session, title: str, company: str, description: str) -> Job:
         f"{' '.join(parsed.get('required_skills', []))} "
         f"{description[:2000]}"
     )
-    emb_id = embedding_service.add_job(str(job.id), text_for_embed, {
-        "title": title,
-        "seniority": parsed.get("seniority_level", ""),
-    })
-    job.embedding_id = emb_id
+    svc = _get_embedding_service()
+    if svc:
+        emb_id = svc.add_job(str(job.id), text_for_embed, {
+            "title": title,
+            "seniority": parsed.get("seniority_level", ""),
+        })
+        job.embedding_id = emb_id
     db.commit()
     db.refresh(job)
     return job
@@ -43,7 +54,9 @@ def delete_job(db: Session, job_id: int) -> bool:
         return False
     if job.embedding_id:
         try:
-            embedding_service.delete_job(job.embedding_id)
+            svc = _get_embedding_service()
+            if svc:
+                svc.delete_job(job.embedding_id)
         except Exception:
             pass
     db.delete(job)

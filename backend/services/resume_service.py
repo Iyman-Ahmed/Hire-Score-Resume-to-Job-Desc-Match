@@ -1,11 +1,20 @@
 from typing import Optional, List
 from sqlalchemy.orm import Session
 from database.models import Resume
-from embeddings.embedding_service import EmbeddingService
 from agents.resume_parser_agent import parse_resume
 from utils.file_parser import extract_text
 
-embedding_service = EmbeddingService()
+_embedding_service = None
+
+def _get_embedding_service():
+    global _embedding_service
+    if _embedding_service is None:
+        try:
+            from embeddings.embedding_service import EmbeddingService
+            _embedding_service = EmbeddingService()
+        except Exception as e:
+            print(f"⚠️  EmbeddingService unavailable: {e}")
+    return _embedding_service
 
 
 def create_resume(db: Session, filename: str, file_bytes: bytes) -> Resume:
@@ -19,11 +28,13 @@ def create_resume(db: Session, filename: str, file_bytes: bytes) -> Resume:
         f"{' '.join(parsed.get('skills', []))} "
         f"{raw_text[:2000]}"
     )
-    emb_id = embedding_service.add_resume(str(resume.id), text_for_embed, {
-        "name": parsed.get("name", ""),
-        "skills": ", ".join(parsed.get("skills", [])[:20]),
-    })
-    resume.embedding_id = emb_id
+    svc = _get_embedding_service()
+    if svc:
+        emb_id = svc.add_resume(str(resume.id), text_for_embed, {
+            "name": parsed.get("name", ""),
+            "skills": ", ".join(parsed.get("skills", [])[:20]),
+        })
+        resume.embedding_id = emb_id
     db.commit()
     db.refresh(resume)
     return resume
@@ -43,7 +54,9 @@ def delete_resume(db: Session, resume_id: int) -> bool:
         return False
     if resume.embedding_id:
         try:
-            embedding_service.delete_resume(resume.embedding_id)
+            svc = _get_embedding_service()
+            if svc:
+                svc.delete_resume(resume.embedding_id)
         except Exception:
             pass
     db.delete(resume)
@@ -59,7 +72,10 @@ def find_similar_candidates(resume_id: int, db: Session, n: int = 5) -> List[dic
         f"{resume.parsed_data.get('name', '')} "
         f"{' '.join(resume.parsed_data.get('skills', []))}"
     )
-    similar = embedding_service.find_similar_resumes(query, n=n, exclude_id=str(resume_id))
+    svc = _get_embedding_service()
+    if not svc:
+        return []
+    similar = svc.find_similar_resumes(query, n=n, exclude_id=str(resume_id))
     results = []
     for item in similar:
         r = db.query(Resume).filter(Resume.id == int(item["id"])).first()
