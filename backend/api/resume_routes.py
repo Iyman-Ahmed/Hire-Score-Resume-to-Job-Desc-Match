@@ -67,7 +67,10 @@ def get_ats_score(resume_id: int, db: Session = Depends(get_db)):
     resume = resume_service.get_resume(db, resume_id)
     if not resume:
         raise HTTPException(status_code=404, detail="Resume not found")
-    return score_ats(resume.parsed_data or {}, resume.raw_text or "")
+    try:
+        return score_ats(resume.parsed_data or {}, resume.raw_text or "")
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"ATS analysis failed: {str(e)}")
 
 
 @router.get("/{resume_id}/similar")

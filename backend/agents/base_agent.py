@@ -35,4 +35,9 @@ def call_llm(system: str, user: str, json_mode: bool = False, fast: bool = False
 def call_llm_json(system: str, user: str) -> dict:
     """LLM call that parses and returns a JSON dict."""
     raw = call_llm(system, user, json_mode=True)
-    return json.loads(raw)
+    try:
+        return json.loads(raw)
+    except (json.JSONDecodeError, TypeError):
+        # Strip markdown code fences if the model wrapped the JSON
+        cleaned = raw.strip().removeprefix("```json").removeprefix("```").removesuffix("```").strip()
+        return json.loads(cleaned)

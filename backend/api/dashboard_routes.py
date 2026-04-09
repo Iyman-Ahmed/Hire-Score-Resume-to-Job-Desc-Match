@@ -7,6 +7,21 @@ from database.models import Resume, Job, Match
 router = APIRouter(prefix="/api/dashboard", tags=["dashboard"])
 
 
+@router.post("/clear")
+def clear_session(db: Session = Depends(get_db)):
+    """Delete all resumes, jobs, and matches — resets the session for a fresh run."""
+    db.query(Match).delete()
+    db.query(Resume).delete()
+    db.query(Job).delete()
+    db.commit()
+    try:
+        from embeddings.embedding_service import EmbeddingService
+        EmbeddingService().clear_all()
+    except Exception:
+        pass
+    return {"cleared": True}
+
+
 @router.get("/stats")
 def get_stats(db: Session = Depends(get_db)):
     """High-level hiring metrics for the dashboard."""

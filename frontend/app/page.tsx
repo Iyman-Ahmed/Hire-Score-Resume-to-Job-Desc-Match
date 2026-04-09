@@ -506,6 +506,9 @@ export default function HomePage() {
         return;
       }
 
+      // 1a — Clear previous session data so old CVs don't carry over
+      await fetch(`${BASE}/api/dashboard/clear`, { method: "POST" });
+
       // 1 — Upload resumes
       setPhase("uploading");
       setProgress({ current: 0, total: files.length, label: "Parsing resumes with AI…" });
