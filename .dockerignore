@@ -1,0 +1,34 @@
+# Python
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+.Python
+*.egg-info/
+.venv/
+venv/
+env/
+
+# Local data (never bake secrets or DB into image)
+backend/.env
+backend/resume_ranking.db
+backend/chroma_db/
+backend/uploads/
+backend/static/
+
+# Node
+frontend/node_modules/
+frontend/.next/
+frontend/out/
+
+# Git & IDE
+.git/
+.gitignore
+.DS_Store
+*.md
+.vscode/
+.idea/
+
+# Misc
+*.docx
+*.log

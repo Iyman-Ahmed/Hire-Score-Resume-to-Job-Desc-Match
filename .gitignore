@@ -1,0 +1,21 @@
+# Python
+__pycache__/
+*.pyc
+.venv/
+venv/
+
+# Secrets & local data
+backend/.env
+backend/resume_ranking.db
+backend/chroma_db/
+backend/uploads/
+backend/static/
+
+# Node
+frontend/node_modules/
+frontend/.next/
+frontend/out/
+
+# OS
+.DS_Store
+*.log
