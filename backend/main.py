@@ -1,7 +1,7 @@
 import os
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
-from fastapi.staticfiles import StaticFiles
+from fastapi.responses import FileResponse
 from dotenv import load_dotenv
 
 from database.database import init_db, SessionLocal
@@ -72,10 +72,24 @@ def health():
 
 
 # Serve Next.js static export when the `static/` directory exists.
-# In local dev it won't exist, so the Next.js dev server handles the UI.
+# Uses a catch-all FastAPI route instead of app.mount("/", StaticFiles(...))
+# because StaticFiles mounted at "/" is a Starlette sub-application that can
+# intercept /health and /api/* routes with its own 404.html even when those
+# routes are registered first — a well-documented Starlette edge case.
 _static_dir = os.path.join(os.path.dirname(__file__), "static")
-if os.path.isdir(_static_dir):
-    app.mount("/", StaticFiles(directory=_static_dir, html=True), name="frontend")
+_static_real = os.path.realpath(_static_dir) if os.path.isdir(_static_dir) else None
+
+if _static_real:
+    @app.get("/{full_path:path}", include_in_schema=False)
+    def serve_spa(full_path: str):
+        # Resolve and jail to static dir to prevent path traversal
+        candidate = os.path.realpath(os.path.join(_static_real, full_path or "index.html"))
+        if not candidate.startswith(_static_real):
+            return FileResponse(os.path.join(_static_real, "index.html"))
+        if os.path.isfile(candidate):
+            return FileResponse(candidate)
+        # SPA fallback — unknown paths serve index.html
+        return FileResponse(os.path.join(_static_real, "index.html"))
 else:
     @app.get("/")
     def root():
