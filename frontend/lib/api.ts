@@ -1,6 +1,7 @@
-// In Docker/HF Spaces: NEXT_PUBLIC_API_URL="" (relative, same origin)
+// In Docker/HF Spaces: NEXT_PUBLIC_API_URL="" → BASE="" (relative, same origin)
 // In local dev:        NEXT_PUBLIC_API_URL="http://localhost:8000"
-const BASE = process.env.NEXT_PUBLIC_API_URL ?? "http://localhost:8000";
+// Use || not ?? so that empty-string also falls through to "" (not localhost)
+const BASE = process.env.NEXT_PUBLIC_API_URL || "";
 
 async function req<T>(path: string, opts?: RequestInit): Promise<T> {
   const res = await fetch(`${BASE}${path}`, {

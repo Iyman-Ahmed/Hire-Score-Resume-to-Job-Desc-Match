@@ -8,7 +8,7 @@ import {
   ChevronDown, ChevronUp, ShieldCheck,
 } from "lucide-react";
 
-const BASE = process.env.NEXT_PUBLIC_API_URL ?? "http://localhost:8000";
+const BASE = process.env.NEXT_PUBLIC_API_URL || "";
 
 // ── Types ──────────────────────────────────────────────────────────────────
 interface Candidate {
