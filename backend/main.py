@@ -55,7 +55,11 @@ def startup():
 
 @app.get("/health")
 def health():
-    return {"status": "ok"}
+    key = os.getenv("GROQ_API_KEY", "")
+    return {
+        "status": "ok",
+        "groq_key_set": bool(key and key.startswith("gsk_")),
+    }
 
 
 # Serve Next.js static export when the `static/` directory exists.

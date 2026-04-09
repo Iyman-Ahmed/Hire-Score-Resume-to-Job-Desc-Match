@@ -480,6 +480,24 @@ export default function HomePage() {
     setCandidates([]);
 
     try {
+      // 0 — Verify backend is reachable
+      try {
+        const ping = await fetch(`${BASE}/health`);
+        if (!ping.ok) throw new Error("Backend returned an error");
+        const { groq_key_set } = await ping.json();
+        if (!groq_key_set) {
+          setError("GROQ_API_KEY is not set on the server. Add it as a Space Secret on HuggingFace.");
+          setPhase("error");
+          return;
+        }
+      } catch (e: unknown) {
+        const msg = e instanceof Error ? e.message : "";
+        if (msg.includes("GROQ_API_KEY")) { setError(msg); setPhase("error"); return; }
+        setError("Cannot reach the API server. Make sure the backend is running.");
+        setPhase("error");
+        return;
+      }
+
       // 1 — Upload resumes
       setPhase("uploading");
       setProgress({ current: 0, total: files.length, label: "Parsing resumes with AI…" });

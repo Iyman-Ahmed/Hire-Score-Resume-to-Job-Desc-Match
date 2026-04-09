@@ -25,6 +25,11 @@ RUN useradd -m -u 1000 appuser
 
 WORKDIR /app
 
+# Install system libraries required by onnxruntime (used by ChromaDB embeddings)
+RUN apt-get update && apt-get install -y --no-install-recommends \
+    libgomp1 \
+    && rm -rf /var/lib/apt/lists/*
+
 # Install Python dependencies
 COPY backend/requirements.txt ./
 RUN pip install --no-cache-dir -r requirements.txt
