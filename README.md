@@ -12,7 +12,7 @@ pinned: false
 
 > Multi-agent AI system that ranks resumes against job descriptions with skill gap analysis and ATS scoring
 
-[![HuggingFace Space](https://img.shields.io/badge/🤗%20HuggingFace-Live%20Demo-blue)](https://huggingface.co/spaces)
+[![HuggingFace Space](https://img.shields.io/badge/🤗%20HuggingFace-Live%20Demo-blue)](https://huggingface.co/spaces/Iyman-ahmed/Hire-Score-Resume-to-Job-Desc-Match)
 [![Python](https://img.shields.io/badge/Python-3.11-blue)](https://python.org)
 [![FastAPI](https://img.shields.io/badge/FastAPI-0.115-green)](https://fastapi.tiangolo.com)
 [![Next.js](https://img.shields.io/badge/Next.js-14-black)](https://nextjs.org)

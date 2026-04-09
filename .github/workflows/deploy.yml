@@ -23,4 +23,4 @@ jobs:
           git config --global user.name "GitHub Actions"
 
           # Push to HF Spaces via HTTPS with token auth
-          git push https://iymanahmed:$HF_TOKEN@huggingface.co/spaces/iymanahmed/RecruitIQ main --force
+          git push https://Iyman-ahmed:$HF_TOKEN@huggingface.co/spaces/Iyman-ahmed/Hire-Score-Resume-to-Job-Desc-Match main --force
