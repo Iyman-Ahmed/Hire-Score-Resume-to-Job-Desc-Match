@@ -10,9 +10,18 @@ from agents.resume_parser_agent import parse_resume
 from agents.jd_analyzer_agent import analyze_job_description
 from agents.matching_agent import score_match
 from agents.explanation_agent import generate_explanation, generate_resume_feedback
-from embeddings.embedding_service import EmbeddingService
 
-embedding_service = EmbeddingService()
+_embedding_service = None
+
+def _get_embedding_service():
+    global _embedding_service
+    if _embedding_service is None:
+        try:
+            from embeddings.embedding_service import EmbeddingService
+            _embedding_service = EmbeddingService()
+        except Exception as e:
+            print(f"⚠️  EmbeddingService unavailable: {e}")
+    return _embedding_service
 
 
 def _sse(event: str, data: dict) -> str:

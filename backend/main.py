@@ -38,22 +38,28 @@ app.include_router(dashboard_router)
 
 @app.on_event("startup")
 def startup():
-    init_db()
-    # Clear all data on every launch so each session starts fresh
-    db = SessionLocal()
     try:
-        db.query(Match).delete()
-        db.query(Resume).delete()
-        db.query(Job).delete()
-        db.commit()
-    finally:
-        db.close()
+        init_db()
+    except Exception as e:
+        print(f"⚠️  DB init failed (non-fatal): {e}")
+    # Clear all data on every launch so each session starts fresh
+    try:
+        db = SessionLocal()
+        try:
+            db.query(Match).delete()
+            db.query(Resume).delete()
+            db.query(Job).delete()
+            db.commit()
+        finally:
+            db.close()
+    except Exception as e:
+        print(f"⚠️  DB clear failed (non-fatal): {e}")
     try:
         from embeddings.embedding_service import EmbeddingService
         EmbeddingService().clear_all()
     except Exception as e:
         print(f"⚠️  ChromaDB clear failed (non-fatal): {e}")
-    print("✅ Database initialized and cleared")
+    print("✅ Startup complete")
 
 
 @app.get("/health")

@@ -48,10 +48,15 @@ USER appuser
 
 WORKDIR /app/backend
 
-# Override env so data lives in a writable volume path
+# Override env so data lives in a writable volume path.
+# XDG_CACHE_HOME pins the ONNX model cache to /app/.cache — a fixed path
+# inside the image that is independent of $HOME. This ensures the pre-baked
+# model is always found at runtime regardless of how HF Spaces sets HOME.
 ENV CHROMA_PERSIST_DIR=/data/chroma_db \
     UPLOAD_DIR=/data/uploads \
-    DATABASE_URL=sqlite:////data/resume_ranking.db
+    DATABASE_URL=sqlite:////data/resume_ranking.db \
+    XDG_CACHE_HOME=/app/.cache \
+    PYTHONUNBUFFERED=1
 
 # Pre-download the 79MB ONNX embedding model at build time so container
 # startup is instant and HF Spaces health checks never time out.
