@@ -19,3 +19,5 @@ frontend/out/
 # OS
 .DS_Store
 *.log
+*.pdf
+*.docx
