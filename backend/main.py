@@ -48,8 +48,11 @@ def startup():
         db.commit()
     finally:
         db.close()
-    from embeddings.embedding_service import EmbeddingService
-    EmbeddingService().clear_all()
+    try:
+        from embeddings.embedding_service import EmbeddingService
+        EmbeddingService().clear_all()
+    except Exception as e:
+        print(f"⚠️  ChromaDB clear failed (non-fatal): {e}")
     print("✅ Database initialized and cleared")
 
 

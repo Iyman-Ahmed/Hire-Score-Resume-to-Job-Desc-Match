@@ -53,6 +53,10 @@ ENV CHROMA_PERSIST_DIR=/data/chroma_db \
     UPLOAD_DIR=/data/uploads \
     DATABASE_URL=sqlite:////data/resume_ranking.db
 
+# Pre-download the 79MB ONNX embedding model at build time so container
+# startup is instant and HF Spaces health checks never time out.
+RUN python3 -c "from chromadb.utils.embedding_functions import ONNXMiniLM_L6_V2; ONNXMiniLM_L6_V2()"
+
 # HF Spaces requires port 7860
 EXPOSE 7860
 
