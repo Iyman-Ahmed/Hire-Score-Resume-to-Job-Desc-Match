@@ -24,12 +24,12 @@ def score_ats(parsed_resume: dict, raw_text: Optional[str] = "") -> dict:
         "certifications": bool(parsed_resume.get("certifications")),
     }
 
-    skills_list = ", ".join(parsed_resume.get("skills", [])[:20]) or "None found"
-    exp_count = len(parsed_resume.get("experience", []))
-    edu_count = len(parsed_resume.get("education", []))
-    cert_count = len(parsed_resume.get("certifications", []))
-    proj_count = len(parsed_resume.get("projects", []))
-    summary_text = str(parsed_resume.get("summary", ""))[:400] or "Not provided"
+    skills_list = ", ".join((parsed_resume.get("skills") or [])[:20]) or "None found"
+    exp_count = len(parsed_resume.get("experience") or [])
+    edu_count = len(parsed_resume.get("education") or [])
+    cert_count = len(parsed_resume.get("certifications") or [])
+    proj_count = len(parsed_resume.get("projects") or [])
+    summary_text = str(parsed_resume.get("summary") or "")[:400] or "Not provided"
 
     prompt = f"""Analyze the resume below and return a structured JSON with section-by-section ATS
 readability scores and specific, actionable improvement suggestions.
@@ -40,7 +40,7 @@ Resume Information:
 - Phone: {parsed_resume.get('phone', 'Not found')}
 - Location: {parsed_resume.get('location', 'Not found')}
 - Professional Summary: {summary_text}
-- Skills ({len(parsed_resume.get('skills', []))} found): {skills_list}
+- Skills ({len(parsed_resume.get('skills') or [])} found): {skills_list}
 - Work Experience entries: {exp_count}
 - Education entries: {edu_count}
 - Certifications: {cert_count}
