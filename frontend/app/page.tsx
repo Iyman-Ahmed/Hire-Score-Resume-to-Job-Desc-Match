@@ -642,6 +642,22 @@ export default function HomePage() {
 
       <div className="max-w-4xl mx-auto px-5 py-10">
 
+        {/* ── Free-tier notice ─────────────────────────────────────────── */}
+        <div
+          className="rounded-xl px-4 py-3 flex items-center gap-3 text-xs mb-6"
+          style={{
+            background: "linear-gradient(90deg, #fef3c710, #fde68a10)",
+            border: "1px solid #f59e0b40",
+            color: "#f59e0b",
+          }}
+        >
+          <span style={{ fontSize: "1.1em", flexShrink: 0 }}>⚡</span>
+          <span>
+            <strong>Heads up:</strong> This app runs on free-tier LLMs hosted on HuggingFace Spaces.
+            Cold starts may take <strong>30–90 seconds</strong> — please be patient on first load.
+          </span>
+        </div>
+
         {/* ── Hero Text ────────────────────────────────────────────────── */}
         {(phase === "idle" || phase === "error") && (
           <div className="text-center mb-10">
